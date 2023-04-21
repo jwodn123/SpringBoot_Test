@@ -15,13 +15,13 @@ public class UserController {
 
     private final UserService userService;
 
-    //회원가입 API
+    // 회원가입 API
     @PostMapping("/signup")
         public String usersignup(@RequestBody @Valid SignRequestDTO signRequestDTO) {
         return userService.usersignup(signRequestDTO);
     }
 
-    //로그인 API
+    // 로그인 API
     @ResponseBody //http요청 body를 자바 객체로 전달받을 수 있다.
     @PostMapping("/login")
     public String userlogin(@RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response) {

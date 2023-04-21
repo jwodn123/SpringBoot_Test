@@ -16,7 +16,7 @@ public class User {
     private Long id;
 
     @NotNull
-    @Column(unique = true) //false이면 중복을 허용
+    @Column(unique = true) // false이면 중복을 허용
     @Pattern(regexp = "[a-z0-9]{4,10}")
     private String username;
 

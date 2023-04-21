@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class Timestamped {
 
     @CreatedDate
-    @Column(updatable = false) //insertable=false는 insert 시점에 막는 것이고, updatable는 update 시점에 막는 기능
+    @Column(updatable = false) // insertable=false는 insert 시점에 막는 것이고, updatable는 update 시점에 막는 기능
     private LocalDateTime createdAt;
 
     @LastModifiedDate

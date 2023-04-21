@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
-public class BoardResponseDTO {
+public class BoardResponseDTO { //데이터 보내주기
 
     private String username;
     private String title;

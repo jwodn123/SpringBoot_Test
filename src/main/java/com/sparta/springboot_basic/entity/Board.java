@@ -38,10 +38,4 @@ public class Board extends Timestamped{
         this.content = requestDTO.getContent();
         this.username = username;
     }
-
-//    public Board(User user) {
-//        this.user = user;
-//    }
-
-
 }

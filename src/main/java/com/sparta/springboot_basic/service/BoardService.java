@@ -25,12 +25,12 @@ public class BoardService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
-    //전체 게시글 조회
+    // 전체 게시글 조회
     public List<BoardResponseDTO> getboardList() {
         return boardRepository.findAllByOrderByModifiedAtDesc().stream().map(BoardResponseDTO::new).collect(Collectors.toList());
     }
 
-    //단일 게시글 조회
+    // 단일 게시글 조회
     public BoardResponseDTO getBoard(Long id) {
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new NullPointerException("선택한 게시물이 없습니다!")
@@ -39,7 +39,7 @@ public class BoardService {
         return new BoardResponseDTO(board);
     }
 
-    //게시글 생성
+    // 게시글 생성
     public BoardResponseDTO createBoard(BoardRequestDTO requestDTO, HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);
         Claims claims;
