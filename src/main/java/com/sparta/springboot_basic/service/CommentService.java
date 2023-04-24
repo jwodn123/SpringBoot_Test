@@ -6,6 +6,7 @@ import com.sparta.springboot_basic.dto.CommentResponseDTO;
 import com.sparta.springboot_basic.entity.Board;
 import com.sparta.springboot_basic.entity.Comment;
 import com.sparta.springboot_basic.entity.User;
+import com.sparta.springboot_basic.entity.UserRole;
 import com.sparta.springboot_basic.jwt.JwtUtil;
 import com.sparta.springboot_basic.repository.BoardRepository;
 import com.sparta.springboot_basic.repository.CommentRepository;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -75,19 +77,28 @@ public class CommentService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "토큰이 유효하지 않습니다.");
             }
 
-            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-            User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "작성자만 수정할 수 있습니다.")
-            );
-
             // 선택한 게시글의 댓글 유무 확인
             Comment comment = commentRepository.findById(board_id).orElseThrow(
                     () -> new IllegalArgumentException("댓글이 존재하지 않습니다.")
             );
 
-            // 댓글 수정
-            comment.update(requestDTO, user);
-            return new CommentResponseDTO(comment);
+            //사용자 권한 ADMIN 일 때
+            User user = new User();
+            UserRole role = user.getRole();
+            if(role == UserRole.ADMIN) {
+                // 댓글 수정
+                comment.update(requestDTO, user);
+                return new CommentResponseDTO(comment);
+            } else {
+                // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
+                user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "작성자만 수정할 수 있습니다")
+                );
+
+                // 댓글 수정
+                comment.update(requestDTO, user);
+                return new CommentResponseDTO(comment);
+            }
         } else {
             return null;
         }
@@ -107,18 +118,24 @@ public class CommentService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "토큰이 유효하지 않습니다.");
             }
 
-            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-            User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "작성자만 삭제할 수 있습니다.")
-            );
-
             // 선택한 게시글의 댓글 유무 확인
             Comment comment = commentRepository.findById(board_id).orElseThrow(
                     () -> new IllegalArgumentException("댓글이 존재하지 않습니다.")
             );
 
-            // 댓글 삭제
-            commentRepository.delete(comment);
+            //사용자 권한 ADMIN 일 때
+            User user = new User();
+            UserRole role = user.getRole();
+            if(role == UserRole.ADMIN) {
+                commentRepository.delete(comment);
+            } else {
+                // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
+                user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "작성자만 삭제할 수 있습니다")
+                );
+
+                commentRepository.delete(comment);
+            }
             return "댓글 삭제 성공";
         } else {
             return "댓글 삭제 실패";

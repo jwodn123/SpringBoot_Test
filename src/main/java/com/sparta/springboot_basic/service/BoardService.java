@@ -6,6 +6,7 @@ import com.sparta.springboot_basic.dto.CommentResponseDTO;
 import com.sparta.springboot_basic.entity.Board;
 import com.sparta.springboot_basic.entity.Comment;
 import com.sparta.springboot_basic.entity.User;
+import com.sparta.springboot_basic.entity.UserRole;
 import com.sparta.springboot_basic.jwt.JwtUtil;
 import com.sparta.springboot_basic.repository.BoardRepository;
 import com.sparta.springboot_basic.repository.CommentRepository;
@@ -98,14 +99,23 @@ public class BoardService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "토큰이 유효하지 않습니다.");
             }
 
-            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-            User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "작성자만 수정할 수 있습니다")
-            );
+            //사용자 권한 ADMIN 일 때
+            User user = new User();
+            UserRole role = user.getRole();
+            if(role == UserRole.ADMIN) {
+                List<Comment> comments = new ArrayList<>();
+                board.update(requestDTO, user, comments);
+                return new BoardResponseDTO(board);
+            } else {
+                // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
+                user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "작성자만 수정할 수 있습니다")
+                );
 
-            List<Comment> comments = new ArrayList<>();
-            board.update(requestDTO, user, comments);
-            return new BoardResponseDTO(board);
+                List<Comment> comments = new ArrayList<>();
+                board.update(requestDTO, user, comments);
+                return new BoardResponseDTO(board);
+            }
         } else {
             return null;
         }
@@ -131,12 +141,19 @@ public class BoardService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "토큰이 유효하지 않습니다.");
             }
 
-            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-            User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "작성자만 삭제할 수 있습니다.")
-            );
+            //사용자 권한 ADMIN 일 때
+            User user = new User();
+            UserRole role = user.getRole();
+            if(role == UserRole.ADMIN) {
+                boardRepository.delete(board);
+            } else {
+                // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
+                user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "작성자만 삭제할 수 있습니다")
+                );
 
-            boardRepository.delete(board);
+                boardRepository.delete(board);
+            }
             return "게시물 삭제 성공!";
         } else {
             return "게시물 삭제 실패!";
