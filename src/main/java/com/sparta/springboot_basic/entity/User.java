@@ -7,12 +7,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 @Entity(name = "users")
+@NoArgsConstructor
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
 
     @NotNull
@@ -21,12 +22,17 @@ public class User {
     private String username;
 
     @NotNull
-    @Pattern(regexp = "[a-zA-Z0-9]{8,15}")
+    @Pattern(regexp = "[a-zA-Z0-9!@#\\$%\\^&\\*()_\\+\\-={\\[\\]}\\\\|;:'\",<.>/?]{8,15}")
     private String password;
 
+    @NotNull
+    @Enumerated(value = EnumType.STRING)
+    private UserRole role;
 
-    public User(String username, String password) {
+
+    public User(String username, String password, UserRole role) {
         this.username = username;
         this.password = password;
+        this.role = role;
     }
 }

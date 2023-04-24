@@ -9,5 +9,7 @@ public class SignRequestDTO { // 회원가입 시 데이터를 받아온다
 
     private String username;
     private String password;
+    private boolean admin = false;
+    private String adminToken = "";
 
 }
