@@ -84,8 +84,7 @@ public class CommentService {
 
             //사용자 권한 ADMIN 일 때
             User user = new User();
-            UserRole role = user.getRole();
-            if(role == UserRole.ADMIN) {
+            if(user.getRole() == UserRole.ADMIN) {
                 // 댓글 수정
                 comment.update(requestDTO, user);
                 return new CommentResponseDTO(comment);
@@ -125,8 +124,7 @@ public class CommentService {
 
             //사용자 권한 ADMIN 일 때
             User user = new User();
-            UserRole role = user.getRole();
-            if(role == UserRole.ADMIN) {
+            if(user.getRole() == UserRole.ADMIN) {
                 commentRepository.delete(comment);
             } else {
                 // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회

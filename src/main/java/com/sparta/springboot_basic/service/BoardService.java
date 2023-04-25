@@ -2,7 +2,6 @@ package com.sparta.springboot_basic.service;
 
 import com.sparta.springboot_basic.dto.BoardRequestDTO;
 import com.sparta.springboot_basic.dto.BoardResponseDTO;
-import com.sparta.springboot_basic.dto.CommentResponseDTO;
 import com.sparta.springboot_basic.entity.Board;
 import com.sparta.springboot_basic.entity.Comment;
 import com.sparta.springboot_basic.entity.User;
@@ -101,8 +100,7 @@ public class BoardService {
 
             //사용자 권한 ADMIN 일 때
             User user = new User();
-            UserRole role = user.getRole();
-            if(role == UserRole.ADMIN) {
+            if(user.getRole() == UserRole.ADMIN) {
                 List<Comment> comments = new ArrayList<>();
                 board.update(requestDTO, user, comments);
                 return new BoardResponseDTO(board);
@@ -143,8 +141,7 @@ public class BoardService {
 
             //사용자 권한 ADMIN 일 때
             User user = new User();
-            UserRole role = user.getRole();
-            if(role == UserRole.ADMIN) {
+            if(user.getRole() == UserRole.ADMIN) {
                 boardRepository.delete(board);
             } else {
                 // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회

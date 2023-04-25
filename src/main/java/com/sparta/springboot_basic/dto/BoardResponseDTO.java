@@ -19,7 +19,6 @@ public class BoardResponseDTO {
     private LocalDateTime modifiedAt;
     private List<CommentResponseDTO> comments;
 
-
     public BoardResponseDTO(Board board) {
         this.id = board.getId();
         this.username = board.getUser().getUsername();
