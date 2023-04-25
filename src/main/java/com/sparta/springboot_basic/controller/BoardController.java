@@ -5,9 +5,11 @@ import com.sparta.springboot_basic.dto.BoardResponseDTO;
 import com.sparta.springboot_basic.service.BoardService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -18,7 +20,7 @@ public class BoardController {
 
     //게시글 전체 조회 API
     @GetMapping("/board")
-    public List<BoardResponseDTO> getboardList() {
+    public ResponseEntity<Map<String, List<BoardResponseDTO>>> getboardList() {
         return boardService.getboardList();
     }
 

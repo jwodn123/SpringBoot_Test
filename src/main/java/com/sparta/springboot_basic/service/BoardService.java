@@ -14,17 +14,19 @@ import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class BoardService {
 
     private final BoardRepository boardRepository;
@@ -33,14 +35,22 @@ public class BoardService {
     private final JwtUtil jwtUtil;
 
     // 전체 게시글 조회
-    public List<BoardResponseDTO> getboardList() {
-        return boardRepository.findAllByOrderByModifiedAtDesc()
-                              .stream()
-                              .map(BoardResponseDTO::new)
-                              .collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public ResponseEntity<Map<String, List<BoardResponseDTO>>> getboardList() {
+        //return boardRepository.findAllByOrderByModifiedAtDesc().stream().map(BoardResponseDTO::new).collect(Collectors.toList());
+        List<Board> boards = boardRepository.findAllByOrderByModifiedAtDesc();
+        List<BoardResponseDTO> boardList = new ArrayList<>();
+        for(Board board : boards) {
+            boardList.add(new BoardResponseDTO(board));
+        }
+
+        Map<String, List<BoardResponseDTO>> result = new HashMap<>();
+        result.put("postList", boardList);
+        return ResponseEntity.ok().body(result);
     }
 
     // 단일 게시글 조회
+    @Transactional(readOnly = true)
     public BoardResponseDTO getBoard(Long id) {
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new NullPointerException("선택한 게시물이 없습니다!")
@@ -50,6 +60,7 @@ public class BoardService {
     }
 
     // 게시글 생성
+    @Transactional
     public BoardResponseDTO createBoard(BoardRequestDTO requestDTO, HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);
         Claims claims;
@@ -79,6 +90,7 @@ public class BoardService {
     }
 
     //게시글 수정
+    @Transactional
     public BoardResponseDTO updateBoard(Long id, BoardRequestDTO requestDTO, HttpServletRequest request) {
 
         //게시물 id 확인
@@ -120,6 +132,7 @@ public class BoardService {
     }
 
     //게시글 삭제
+    @Transactional
     public String deleteBoard(Long id, HttpServletRequest request) {
 
         //게시물 id 확인
