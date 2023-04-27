@@ -1,7 +1,7 @@
-package com.sparta.myselectshop.security;
+package com.sparta.springboot_basic.security;
 
-import com.sparta.myselectshop.entity.User;
-import com.sparta.myselectshop.repository.UserRepository;
+import com.sparta.springboot_basic.entity.User;
+import com.sparta.springboot_basic.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,7 +19,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
-        return new UserDetailsImpl(user, user.getUsername());
+        return new com.sparta.springboot_basic.security.UserDetailsImpl(user, user.getUsername());
     }
 
 }

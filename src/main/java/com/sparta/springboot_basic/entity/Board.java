@@ -26,7 +26,7 @@ public class Board extends Timestamped{
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "board", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     @OrderBy("createdAt desc") //댓글은 작성 날짜 기준 내림차순으로 정렬
     private List<Comment> comments;
 
@@ -36,6 +36,12 @@ public class Board extends Timestamped{
         this.content = requestDTO.getContent();
         this.user = user;
         this.comments = comments;
+    }
+
+    public Board(BoardRequestDTO requestDTO, User user) {
+        this.title = requestDTO.getTitle();
+        this.content = requestDTO.getContent();
+        this.user = user;
     }
 
     public void update(BoardRequestDTO requestDTO, User user, List<Comment> comments) {

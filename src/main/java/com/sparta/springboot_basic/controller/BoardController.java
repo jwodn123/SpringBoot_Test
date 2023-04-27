@@ -2,10 +2,13 @@ package com.sparta.springboot_basic.controller;
 
 import com.sparta.springboot_basic.dto.BoardRequestDTO;
 import com.sparta.springboot_basic.dto.BoardResponseDTO;
+import com.sparta.springboot_basic.security.UserDetailsImpl;
 import com.sparta.springboot_basic.service.BoardService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,20 +35,20 @@ public class BoardController {
 
     //게시글 생성 API
     @PostMapping("/board")
-    public BoardResponseDTO createBoard(@RequestBody BoardRequestDTO requestDTO, HttpServletRequest request) {
-        return boardService.createBoard(requestDTO, request);
+    public BoardResponseDTO createBoard(@RequestBody BoardRequestDTO requestDTO, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return boardService.createBoard(requestDTO, userDetails.getUser());
     }
 
     //게시글 수정 API
     @PutMapping("/board/{id}")
-    public BoardResponseDTO updateBoard(@PathVariable Long id, @RequestBody BoardRequestDTO requestDTO, HttpServletRequest request) {
-        return boardService.updateBoard(id, requestDTO, request);
+    public BoardResponseDTO updateBoard(@PathVariable Long id, @RequestBody BoardRequestDTO requestDTO, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return boardService.updateBoard(id, requestDTO, userDetails.getUser());
     }
 
     //게시글 삭제 API
     @DeleteMapping("/board/{id}")
-    public String deleteBoard(@PathVariable Long id, HttpServletRequest request) {
-        return boardService.deleteBoard(id, request);
+    public String deleteBoard(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return boardService.deleteBoard(id, userDetails.getUser());
     }
 
 

@@ -22,7 +22,7 @@ public class User {
     private String username;
 
     @NotNull
-    @Pattern(regexp = "[a-zA-Z0-9!@#\\$%\\^&\\*()_\\+\\-={\\[\\]}\\\\|;:'\",<.>/?]{8,15}")
+    //@Pattern(regexp = "[a-zA-Z0-9]{8,15}")
     private String password;
 
     @NotNull

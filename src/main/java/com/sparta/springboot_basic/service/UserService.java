@@ -9,6 +9,7 @@ import com.sparta.springboot_basic.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${admin.secret.key}")
     private String ADMIN_TOKEN;
@@ -27,19 +29,19 @@ public class UserService {
     @Transactional
     public String usersignup(SignRequestDTO signRequestDTO) {
         String username = signRequestDTO.getUsername();
-        String password = signRequestDTO.getPassword();
+        String password = passwordEncoder.encode(signRequestDTO.getPassword());
 
-        // 사용자 중복 체크
+        // 회원 중복 확인
         Optional<User> found = userRepository.findByUsername(username);
         if (found.isPresent()) {
-            throw new IllegalArgumentException("중복된 username 입니다.");
+            throw new IllegalArgumentException("중복된 사용자가 존재합니다.");
         }
 
         // 사용자 ROLE 확인
         UserRole role = UserRole.USER;
         if (signRequestDTO.isAdmin()) {
             if (!signRequestDTO.getAdminToken().equals(ADMIN_TOKEN)) {
-                throw new IllegalArgumentException("ADMIN 암호가 틀려 등록이 불가능합니다.");
+                throw new IllegalArgumentException("관리자 암호가 틀려 등록이 불가능합니다.");
             }
             role = UserRole.ADMIN;
         }
@@ -61,10 +63,11 @@ public class UserService {
         );
 
         // 비밀번호 확인
-        if(!user.getPassword().equals(password)){
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        if(!passwordEncoder.matches(password, user.getPassword())){
+            throw  new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
+
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername(), user.getRole()));
-        return "토근을 Header에 추가 성공!";
+        return "로그인 성공!";
     }
 }

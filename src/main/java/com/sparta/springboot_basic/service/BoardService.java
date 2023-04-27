@@ -61,133 +61,47 @@ public class BoardService {
 
     // 게시글 생성
     @Transactional
-    public BoardResponseDTO createBoard(BoardRequestDTO requestDTO, HttpServletRequest request) {
-        String token = jwtUtil.resolveToken(request);
-        Claims claims;
-
-        // 토큰이 있는 경우에만 게시글 등록
-        if (token != null) {
-            if (jwtUtil.validateToken(token)) {
-                // 토큰에서 사용자 정보 가져오기
-                claims = jwtUtil.getUserInfoFromToken(token);
-            } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "토큰이 유효하지 않습니다.");
-            }
-
-            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-            User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
-            );
+    public BoardResponseDTO createBoard(BoardRequestDTO requestDTO, User user) {
 
             List<Comment> comments = new ArrayList<>();
 
             // 요청받은 DTO 로 DB에 저장할 객체 만들기
             Board board = boardRepository.saveAndFlush(new Board(requestDTO, user, comments));
             return new BoardResponseDTO(board);
-        } else {
-            return null;
-        }
     }
 
     //게시글 수정
     @Transactional
-    public BoardResponseDTO updateBoard(Long id, BoardRequestDTO requestDTO, HttpServletRequest request) {
+    public BoardResponseDTO updateBoard(Long id, BoardRequestDTO requestDTO, User user) {
 
         //게시물 id 확인
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("수정할 게시물이 없습니다.")
         );
 
-        String token = jwtUtil.resolveToken(request);
-        Claims claims;
-
-        // 토큰이 있는 경우에만 게시글 수정
-        if (token != null) {
-            if (jwtUtil.validateToken(token)) {
-                // 토큰에서 사용자 정보 가져오기
-                claims = jwtUtil.getUserInfoFromToken(token);
-            } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "토큰이 유효하지 않습니다.");
-            }
-
-            //사용자 권한 ADMIN 일 때
-            User user = new User();
-            if(user.getRole() == UserRole.ADMIN) {
-                List<Comment> comments = new ArrayList<>();
-                board.update(requestDTO, user, comments);
-                return new BoardResponseDTO(board);
-            } else {
-                // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-                user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "작성자만 수정할 수 있습니다")
-                );
-
-                List<Comment> comments = new ArrayList<>();
-                board.update(requestDTO, user, comments);
-                return new BoardResponseDTO(board);
-            }
-        } else {
-            return null;
+        if (!user.getUsername().equals(board.getUser().getUsername()) && user.getRole() != UserRole.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "작성자만 수정할 수 있습니다");
         }
+
+        List<Comment> comments = new ArrayList<>();
+        board.update(requestDTO, user, comments);
+        return new BoardResponseDTO(board);
     }
 
     //게시글 삭제
     @Transactional
-    public String deleteBoard(Long id, HttpServletRequest request) {
+    public String deleteBoard(Long id, User user) {
 
         //게시물 id 확인
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new NullPointerException("삭제할 게시물이 없습니다.")
         );
 
-        String token = jwtUtil.resolveToken(request);
-        Claims claims;
-
-        // 토큰이 있는 경우에만 게시글 삭제
-        if (token != null) {
-            if (jwtUtil.validateToken(token)) {
-                // 토큰에서 사용자 정보 가져오기
-                claims = jwtUtil.getUserInfoFromToken(token);
-            } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "토큰이 유효하지 않습니다.");
-            }
-
-            //사용자 권한 ADMIN 일 때
-            User user = new User();
-            if(user.getRole() == UserRole.ADMIN) {
-                boardRepository.delete(board);
-            } else {
-                // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-                user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "작성자만 삭제할 수 있습니다")
-                );
-
-                boardRepository.delete(board);
-            }
-            return "게시물 삭제 성공!";
-        } else {
-            return "게시물 삭제 실패!";
+        if (!user.getUsername().equals(board.getUser().getUsername()) && user.getRole() != UserRole.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "작성자만 삭제할 수 있습니다");
         }
 
+        boardRepository.delete(board);
+        return "게시물 삭제 성공!";
     }
-
-
-//    //토큰 확인 및 검증하는 함수
-//    public void checkToken(HttpServletRequest request) {
-//        String token = jwtUtil.resolveToken(request);
-//        Claims claims;
-//
-//        // 토큰이 있는 경우에만 게시글 수정
-//        if (jwtUtil.validateToken(token)) {
-//            // 토큰에서 사용자 정보 가져오기
-//            claims = jwtUtil.getUserInfoFromToken(token);
-//        } else {
-//            throw new IllegalArgumentException("토큰이 유효하지 않습니다.");
-//        }
-//
-//        // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-//        User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-//                () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
-//        );
-//    }
 }
