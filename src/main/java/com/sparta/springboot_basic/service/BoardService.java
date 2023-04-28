@@ -30,9 +30,6 @@ import java.util.stream.Collectors;
 public class BoardService {
 
     private final BoardRepository boardRepository;
-    private final UserRepository userRepository;
-    private final CommentRepository commentRepository;
-    private final JwtUtil jwtUtil;
 
     // 전체 게시글 조회
     @Transactional(readOnly = true)
@@ -51,57 +48,58 @@ public class BoardService {
 
     // 단일 게시글 조회
     @Transactional(readOnly = true)
-    public BoardResponseDTO getBoard(Long id) {
+    public ResponseEntity<BoardResponseDTO> getBoard(Long id) {
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new NullPointerException("선택한 게시물이 없습니다!")
         );
 
-        return new BoardResponseDTO(board);
+        return ResponseEntity.status(HttpStatus.OK).body(new BoardResponseDTO(board));
+
     }
 
     // 게시글 생성
     @Transactional
-    public BoardResponseDTO createBoard(BoardRequestDTO requestDTO, User user) {
+    public ResponseEntity<BoardResponseDTO> createBoard(BoardRequestDTO requestDTO, User user) {
 
-            List<Comment> comments = new ArrayList<>();
+        // 요청받은 DTO 로 DB에 저장할 객체 만들기
+        List<Comment> comments = new ArrayList<>();
+        Board board = boardRepository.saveAndFlush(new Board(requestDTO, user, comments));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new BoardResponseDTO(board));
 
-            // 요청받은 DTO 로 DB에 저장할 객체 만들기
-            Board board = boardRepository.saveAndFlush(new Board(requestDTO, user, comments));
-            return new BoardResponseDTO(board);
     }
 
     //게시글 수정
     @Transactional
-    public BoardResponseDTO updateBoard(Long id, BoardRequestDTO requestDTO, User user) {
+    public ResponseEntity<BoardResponseDTO> updateBoard(Long id, BoardRequestDTO requestDTO, User user) {
 
         //게시물 id 확인
         Board board = boardRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("수정할 게시물이 없습니다.")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "수정할 게시물이 없습니다.")
         );
 
-        if (!user.getUsername().equals(board.getUser().getUsername()) && user.getRole() != UserRole.ADMIN) {
+        if(!user.getUsername().equals(board.getUser().getUsername()) && user.getRole() != UserRole.ADMIN) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "작성자만 수정할 수 있습니다");
         }
 
         List<Comment> comments = new ArrayList<>();
         board.update(requestDTO, user, comments);
-        return new BoardResponseDTO(board);
+        return ResponseEntity.status(HttpStatus.OK).body(new BoardResponseDTO(board));
     }
 
     //게시글 삭제
     @Transactional
-    public String deleteBoard(Long id, User user) {
+    public ResponseEntity<String> deleteBoard(Long id, User user) {
 
         //게시물 id 확인
         Board board = boardRepository.findById(id).orElseThrow(
-                () -> new NullPointerException("삭제할 게시물이 없습니다.")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "삭제할 게시물이 없습니다.")
         );
 
-        if (!user.getUsername().equals(board.getUser().getUsername()) && user.getRole() != UserRole.ADMIN) {
+        if(!user.getUsername().equals(board.getUser().getUsername()) && user.getRole() != UserRole.ADMIN) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "작성자만 삭제할 수 있습니다");
         }
 
         boardRepository.delete(board);
-        return "게시물 삭제 성공!";
+        return ResponseEntity.status(HttpStatus.OK).body("게시물 삭제 성공!");
     }
 }

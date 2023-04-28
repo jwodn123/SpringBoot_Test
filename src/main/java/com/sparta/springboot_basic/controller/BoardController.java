@@ -29,25 +29,25 @@ public class BoardController {
 
     //게시글 단일 조회 API
     @GetMapping("/board/{id}")
-    public BoardResponseDTO getBoard(@PathVariable Long id) {
+    public ResponseEntity<BoardResponseDTO> getBoard(@PathVariable Long id) {
         return boardService.getBoard(id);
     }
 
     //게시글 생성 API
     @PostMapping("/board")
-    public BoardResponseDTO createBoard(@RequestBody BoardRequestDTO requestDTO, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<BoardResponseDTO> createBoard(@RequestBody BoardRequestDTO requestDTO, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return boardService.createBoard(requestDTO, userDetails.getUser());
     }
 
     //게시글 수정 API
     @PutMapping("/board/{id}")
-    public BoardResponseDTO updateBoard(@PathVariable Long id, @RequestBody BoardRequestDTO requestDTO, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<BoardResponseDTO> updateBoard(@PathVariable Long id, @RequestBody BoardRequestDTO requestDTO, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return boardService.updateBoard(id, requestDTO, userDetails.getUser());
     }
 
     //게시글 삭제 API
     @DeleteMapping("/board/{id}")
-    public String deleteBoard(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<String>  deleteBoard(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return boardService.deleteBoard(id, userDetails.getUser());
     }
 
