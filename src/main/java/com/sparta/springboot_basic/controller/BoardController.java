@@ -4,10 +4,8 @@ import com.sparta.springboot_basic.dto.BoardRequestDTO;
 import com.sparta.springboot_basic.dto.BoardResponseDTO;
 import com.sparta.springboot_basic.security.UserDetailsImpl;
 import com.sparta.springboot_basic.service.BoardService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 

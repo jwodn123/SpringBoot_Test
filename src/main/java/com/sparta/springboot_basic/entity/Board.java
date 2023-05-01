@@ -30,12 +30,16 @@ public class Board extends Timestamped{
     @OrderBy("createdAt desc") //댓글은 작성 날짜 기준 내림차순으로 정렬
     private List<Comment> comments;
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+    private List<Like> likes = new ArrayList<>();
 
-    public Board(BoardRequestDTO requestDTO, User user, List<Comment> comments) {
+
+    public Board(BoardRequestDTO requestDTO, User user, List<Comment> comments, List<Like> likes) {
         this.title = requestDTO.getTitle();
         this.content = requestDTO.getContent();
         this.user = user;
         this.comments = comments;
+        this.likes = likes;
     }
 
     public Board(BoardRequestDTO requestDTO, User user) {

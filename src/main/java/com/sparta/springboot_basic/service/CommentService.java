@@ -3,10 +3,7 @@ package com.sparta.springboot_basic.service;
 import com.sparta.springboot_basic.dto.BoardResponseDTO;
 import com.sparta.springboot_basic.dto.CommentRequestDTO;
 import com.sparta.springboot_basic.dto.CommentResponseDTO;
-import com.sparta.springboot_basic.entity.Board;
-import com.sparta.springboot_basic.entity.Comment;
-import com.sparta.springboot_basic.entity.User;
-import com.sparta.springboot_basic.entity.UserRole;
+import com.sparta.springboot_basic.entity.*;
 import com.sparta.springboot_basic.jwt.JwtUtil;
 import com.sparta.springboot_basic.repository.BoardRepository;
 import com.sparta.springboot_basic.repository.CommentRepository;
@@ -38,7 +35,8 @@ public class CommentService {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "게시물이 존재하지 않습니다.")
         );
 
-        Comment comment = commentRepository.save(new Comment(requestDTO, board, user));
+        List<Like> likes = new ArrayList<>();
+        Comment comment = commentRepository.save(new Comment(requestDTO, board, user, likes));
         return ResponseEntity.status(HttpStatus.CREATED).body(new CommentResponseDTO(comment));
     }
 

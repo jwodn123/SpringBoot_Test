@@ -25,7 +25,7 @@ public class UserController {
 
     // 회원가입 API
     @PostMapping("/signup")
-        public ResponseEntity<String> usersignup(@RequestBody @Valid SignRequestDTO signRequestDTO) {
+        public ResponseEntity<String> usersignup(@RequestBody SignRequestDTO signRequestDTO) {
         return userService.usersignup(signRequestDTO);
     }
 

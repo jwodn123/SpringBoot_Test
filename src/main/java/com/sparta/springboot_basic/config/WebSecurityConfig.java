@@ -2,7 +2,6 @@ package com.sparta.springboot_basic.config;
 
 import com.sparta.springboot_basic.jwt.JwtAuthFilter;
 import com.sparta.springboot_basic.jwt.JwtUtil;
-import com.sparta.springboot_basic.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -46,9 +45,12 @@ public class WebSecurityConfig { //기본적인 시큐리티 설정 및 구현 �
         // 기본 설정인 Session 방식은 사용하지 않고 JWT 방식을 사용하기 위한 설정
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        http.authorizeHttpRequests() // HTTP 요청에 대한 권한 부여 규칙을 구성
-                .requestMatchers("/api/user/**").permitAll() //모든 사용자가 /api/user/로 시작하는 모든 URL에 액세스할 수 있음
-                .anyRequest().authenticated() //위 요청을 제외한 모든 요청은 인증이 필요함을 나타냄.
+        // HTTP 요청에 대한 권한 부여 규칙을 구성
+        http.authorizeHttpRequests()
+                //모든 사용자가 /api/user/로 시작하는 모든 URL에 액세스할 수 있음
+                .requestMatchers("/api/user/**").permitAll()
+                //위 요청을 제외한 모든 요청은 인증이 필요함을 나타냄
+                .anyRequest().authenticated()
                 // JWT 인증/인가를 사용하기 위한 설정
                 .and().addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 

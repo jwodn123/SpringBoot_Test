@@ -32,7 +32,7 @@ public class UserService {
     @Transactional
     public ResponseEntity<String> usersignup(SignRequestDTO signRequestDTO) {
         String username = signRequestDTO.getUsername();
-        String password = passwordEncoder.encode(signRequestDTO.getPassword());
+        String password = passwordEncoder.encode(signRequestDTO.getPassword()); //비밀번호 암호화
 
         // 회원 중복 확인
         Optional<User> found = userRepository.findByUsername(username);

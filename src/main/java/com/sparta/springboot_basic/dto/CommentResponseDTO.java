@@ -1,6 +1,7 @@
 package com.sparta.springboot_basic.dto;
 
 import com.sparta.springboot_basic.entity.Comment;
+import com.sparta.springboot_basic.entity.Like;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ public class CommentResponseDTO {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private String username;
+    private int likeNum;
 
 
     public CommentResponseDTO(Comment comment) {
@@ -23,5 +25,6 @@ public class CommentResponseDTO {
         this.createdAt = comment.getCreatedAt();
         this.modifiedAt = comment.getModifiedAt();
         this.username = comment.getUser().getUsername();
+        this.likeNum = comment.getLikes().stream().mapToInt(Like::getClikeNum).sum();
     }
 }

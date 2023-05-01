@@ -18,17 +18,14 @@ public class User {
 
     @NotNull
     @Column(unique = true) // false이면 중복을 허용
-    @Pattern(regexp = "[a-z0-9]{4,10}")
     private String username;
 
     @NotNull
-    //@Pattern(regexp = "[a-zA-Z0-9]{8,15}")
     private String password;
 
     @NotNull
     @Enumerated(value = EnumType.STRING)
     private UserRole role;
-
 
     public User(String username, String password, UserRole role) {
         this.username = username;

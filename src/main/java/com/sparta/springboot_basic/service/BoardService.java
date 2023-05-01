@@ -2,16 +2,8 @@ package com.sparta.springboot_basic.service;
 
 import com.sparta.springboot_basic.dto.BoardRequestDTO;
 import com.sparta.springboot_basic.dto.BoardResponseDTO;
-import com.sparta.springboot_basic.entity.Board;
-import com.sparta.springboot_basic.entity.Comment;
-import com.sparta.springboot_basic.entity.User;
-import com.sparta.springboot_basic.entity.UserRole;
-import com.sparta.springboot_basic.jwt.JwtUtil;
+import com.sparta.springboot_basic.entity.*;
 import com.sparta.springboot_basic.repository.BoardRepository;
-import com.sparta.springboot_basic.repository.CommentRepository;
-import com.sparta.springboot_basic.repository.UserRepository;
-import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +42,7 @@ public class BoardService {
     @Transactional(readOnly = true)
     public ResponseEntity<BoardResponseDTO> getBoard(Long id) {
         Board board = boardRepository.findById(id).orElseThrow(
-                () -> new NullPointerException("선택한 게시물이 없습니다!")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "선택한 게시물이 없습니다!")
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(new BoardResponseDTO(board));
@@ -63,7 +55,8 @@ public class BoardService {
 
         // 요청받은 DTO 로 DB에 저장할 객체 만들기
         List<Comment> comments = new ArrayList<>();
-        Board board = boardRepository.saveAndFlush(new Board(requestDTO, user, comments));
+        List<Like> likes = new ArrayList<>();
+        Board board = boardRepository.saveAndFlush(new Board(requestDTO, user, comments, likes));
         return ResponseEntity.status(HttpStatus.CREATED).body(new BoardResponseDTO(board));
 
     }
@@ -102,4 +95,7 @@ public class BoardService {
         boardRepository.delete(board);
         return ResponseEntity.status(HttpStatus.OK).body("게시물 삭제 성공!");
     }
+
+
+
 }
