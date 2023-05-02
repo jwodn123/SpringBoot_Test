@@ -32,7 +32,7 @@ public class CommentService {
 
         // 선택한 게시글에 대한 DB 정보 유무 확인
         Board board = boardRepository.findById(board_id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "게시물이 존재하지 않습니다.")
+                () -> new IllegalArgumentException("게시물이 존재하지 않습니다.")
         );
 
         List<Like> likes = new ArrayList<>();
@@ -45,12 +45,12 @@ public class CommentService {
 
         // 선택한 게시글의 댓글 유무 확인
         Comment comment = commentRepository.findById(board_id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "댓글이 존재하지 않습니다.")
+                () -> new IllegalArgumentException("댓글이 존재하지 않습니다.")
         );
 
         //사용자 본인이거나, 권한이 ADMIN이 아니면 수정 불가
         if(!user.getUsername().equals(comment.getUser().getUsername()) && user.getRole() != UserRole.ADMIN) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "작성자만 수정할 수 있습니다");
+            throw new IllegalArgumentException("작성자만 수정할 수 있습니다");
         }
 
         comment.update(requestDTO, user);
@@ -67,7 +67,7 @@ public class CommentService {
 
         //사용자 본인이거나, 권한이 ADMIN이 아니면 삭제 불가
         if(!user.getUsername().equals(comment.getUser().getUsername()) && user.getRole() != UserRole.ADMIN) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "작성자만 삭할 수 있습니다");
+            throw new IllegalArgumentException("작성자만 삭할 수 있습니다");
         }
 
         commentRepository.delete(comment);

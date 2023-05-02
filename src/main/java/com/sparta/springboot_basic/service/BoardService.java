@@ -42,7 +42,7 @@ public class BoardService {
     @Transactional(readOnly = true)
     public ResponseEntity<BoardResponseDTO> getBoard(Long id) {
         Board board = boardRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "선택한 게시물이 없습니다!")
+                () -> new IllegalArgumentException("선택한 게시물이 없습니다!")
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(new BoardResponseDTO(board));
@@ -67,11 +67,11 @@ public class BoardService {
 
         //게시물 id 확인
         Board board = boardRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "수정할 게시물이 없습니다.")
+                () -> new IllegalArgumentException("수정할 게시물이 없습니다.")
         );
 
         if(!user.getUsername().equals(board.getUser().getUsername()) && user.getRole() != UserRole.ADMIN) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "작성자만 수정할 수 있습니다");
+            throw new IllegalArgumentException("작성자만 수정할 수 있습니다");
         }
 
         List<Comment> comments = new ArrayList<>();
@@ -85,11 +85,11 @@ public class BoardService {
 
         //게시물 id 확인
         Board board = boardRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "삭제할 게시물이 없습니다.")
+                () -> new IllegalArgumentException("삭제할 게시물이 없습니다.")
         );
 
         if(!user.getUsername().equals(board.getUser().getUsername()) && user.getRole() != UserRole.ADMIN) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "작성자만 삭제할 수 있습니다");
+            throw new IllegalArgumentException("작성자만 삭제할 수 있습니다");
         }
 
         boardRepository.delete(board);
