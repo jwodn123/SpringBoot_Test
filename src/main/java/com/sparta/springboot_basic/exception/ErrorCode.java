@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public enum ExceptionStatus {
+public enum ErrorCode {
 
     //BAD_REQUEST
     USER_Duplicate(HttpStatus.BAD_REQUEST,"중복된 username 입니다.", 400),
@@ -17,12 +17,12 @@ public enum ExceptionStatus {
     POST_NOT_FOUND(HttpStatus.NOT_FOUND,"게시글을 찾을 수 없습니다.", 400),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND,"댓글을 찾을 수 없습니다.", 400);
 
-
-
+    private final HttpStatus httpStatus;
     private final String errorMessage;
     private final int statusCode;
 
-    ExceptionStatus(String errorMessage, int statusCode) {
+    ErrorCode(HttpStatus httpStatus, String errorMessage, int statusCode) {
+        this.httpStatus = httpStatus;
         this.errorMessage = errorMessage;
         this.statusCode = statusCode;
     }

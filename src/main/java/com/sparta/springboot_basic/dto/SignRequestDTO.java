@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class SignRequestDTO { // 회원가입 시 데이터를 받아온다
+public class SignRequestDTO {
 
     @Pattern(regexp = "(?=.*[a-z])(?=.*[0-9])(?=\\S+$).{4,10}",
             message = "아이디는 알파벳 소문자, 숫자를 입력하고 4~10자리로 구성해주세요.")

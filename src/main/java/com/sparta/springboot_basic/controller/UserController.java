@@ -7,13 +7,16 @@ import com.sparta.springboot_basic.repository.UserRepository;
 import com.sparta.springboot_basic.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -25,7 +28,11 @@ public class UserController {
 
     // 회원가입 API
     @PostMapping("/signup")
-        public ResponseEntity<String> usersignup(@RequestBody SignRequestDTO signRequestDTO) {
+    public ResponseEntity<Object> usersignup(@Valid @RequestBody SignRequestDTO signRequestDTO, BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) {
+            Map<String, Object> validatorResult = userService.validateHandling(bindingResult);
+            return ResponseEntity.badRequest().body(validatorResult);
+        }
         return userService.usersignup(signRequestDTO);
     }
 
